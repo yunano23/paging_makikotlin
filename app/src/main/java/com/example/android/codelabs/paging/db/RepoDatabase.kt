@@ -23,13 +23,9 @@ import android.content.Context
 import com.example.android.codelabs.paging.model.Repo
 
 /**
- * Database schema that holds the list of repos.
+ * RoomDatabase
  */
-@Database(
-        entities = [Repo::class],
-        version = 1,
-        exportSchema = false
-)
+@Database(entities = [Repo::class], version = 1, exportSchema = false)
 abstract class RepoDatabase : RoomDatabase() {
 
     abstract fun reposDao(): RepoDao
@@ -41,13 +37,23 @@ abstract class RepoDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): RepoDatabase =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE
-                            ?: buildDatabase(context).also { INSTANCE = it }
+                    // 待ってる間に他のスレッドで生成されるかもしれないから再確認
+                    INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
                 }
 
         private fun buildDatabase(context: Context) =
-                Room.databaseBuilder(context.applicationContext,
-                        RepoDatabase::class.java, "Github.db")
+                Room.databaseBuilder(context.applicationContext, RepoDatabase::class.java, "Github.db")
                         .build()
     }
 }
+
+
+/*
+    @Volatile
+        このプロパティの JVMバッキングフィールド をvolatileとしてマークすると、
+        このフィールドへの書込は、他のスレッドからすぐに見えるようになる。
+    synchronized
+        排他制御＝複数のプロセス（またはスレッド）が同時に入ることを防ぐ
+        １つのスレッドで実行中の時は、その処理が終わるまで、他のスレッドはアクセスできない
+
+ */

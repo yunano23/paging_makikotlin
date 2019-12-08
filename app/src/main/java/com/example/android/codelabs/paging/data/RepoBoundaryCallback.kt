@@ -28,6 +28,7 @@ import com.example.android.codelabs.paging.model.Repo
 /**
  * This boundary callback gets notified when user reaches to the edges of the list for example when
  * the database cannot provide any more data.
+ * リストの端まで到達すると通知を受けるバウンダリーコールバック
  **/
 class RepoBoundaryCallback(
         private val query: String,
@@ -39,19 +40,19 @@ class RepoBoundaryCallback(
         private const val NETWORK_PAGE_SIZE = 50
     }
 
-    // keep the last requested page. When the request is successful, increment the page number.
+    // リクエストしたページ
     private var lastRequestedPage = 1
 
     private val _networkErrors = MutableLiveData<String>()
-    // LiveData of network errors.
     val networkErrors: LiveData<String>
         get() = _networkErrors
 
-    // avoid triggering multiple requests in the same time
+    // 同時に実行されるのを防止
     private var isRequestInProgress = false
 
     /**
      * Database returned 0 items. We should query the backend for more items.
+     * イニシャルロードが、0アイテムの場合
      */
     override fun onZeroItemsLoaded() {
         Log.d("RepoBoundaryCallback", "onZeroItemsLoaded")
@@ -60,24 +61,33 @@ class RepoBoundaryCallback(
 
     /**
      * When all items in the database were loaded, we need to query the backend for more items.
+     * DBの最後に到達した場合（バックエンドでロードが必要）
      */
     override fun onItemAtEndLoaded(itemAtEnd: Repo) {
         Log.d("RepoBoundaryCallback", "onItemAtEndLoaded")
         requestAndSaveData(query)
     }
 
+    /**
+     * retrofitで、ロード実行
+     */
     private fun requestAndSaveData(query: String) {
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { repos ->
-            cache.insert(repos) {
-                lastRequestedPage++
-                isRequestInProgress = false
-            }
-        }, { error ->
-            _networkErrors.postValue(error)
-            isRequestInProgress = false
-        })
+        //ページインデックスを使用してロード
+        searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE,
+                //成功時
+                { repos ->
+                    cache.insert(repos) {
+                        lastRequestedPage++
+                        isRequestInProgress = false
+                    }
+                },
+                //失敗時
+                { error ->
+                    _networkErrors.postValue(error)
+                    isRequestInProgress = false
+                })
     }
 }

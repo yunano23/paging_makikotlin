@@ -55,6 +55,7 @@ fun searchRepos(
 
     val apiQuery = query + IN_QUALIFIER
 
+    //Apiから取得実行し、Callとして受取る　（enqueue:非同期でリクエストを送信し、コールバックを通知)
     service.searchRepos(apiQuery, page, itemsPerPage).enqueue(
             object : Callback<RepoSearchResponse> {
                 override fun onFailure(call: Call<RepoSearchResponse>?, t: Throwable) {
@@ -82,26 +83,21 @@ fun searchRepos(
  * Github API communication setup via Retrofit.
  */
 interface GithubService {
-    /**
-     * Get repos ordered by stars.
-     */
-    @GET("search/repositories?sort=stars")
-    fun searchRepos(
-        @Query("q") query: String,
-        @Query("page") page: Int,
-        @Query("per_page") itemsPerPage: Int
-    ): Call<RepoSearchResponse>
-
     companion object {
         private const val BASE_URL = "https://api.github.com/"
 
+        //GithubService作成
         fun create(): GithubService {
+
+            //OkHttpClient
             val logger = HttpLoggingInterceptor()
             logger.level = Level.BASIC
 
             val client = OkHttpClient.Builder()
                     .addInterceptor(logger)
                     .build()
+
+            //Retrofit
             return Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(client)
@@ -110,4 +106,10 @@ interface GithubService {
                     .create(GithubService::class.java)
         }
     }
+
+    /**
+     * Get repos ordered by stars.
+     */
+    @GET("search/repositories?sort=stars")
+    fun searchRepos(@Query("q") query: String, @Query("page") page: Int, @Query("per_page") itemsPerPage: Int): Call<RepoSearchResponse>
 }
