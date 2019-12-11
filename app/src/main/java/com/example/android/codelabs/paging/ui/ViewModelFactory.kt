@@ -19,7 +19,6 @@ package com.example.android.codelabs.paging.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.codelabs.paging.data.GithubRepository
-import com.example.android.codelabs.paging.db.GitRepository
 
 /**
  * Factory for ViewModels
