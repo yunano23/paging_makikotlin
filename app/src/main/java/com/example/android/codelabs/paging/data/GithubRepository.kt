@@ -26,9 +26,12 @@ import com.example.android.codelabs.paging.model.RepoSearchResult
  * Repository class that works with local and remote data sources.
  */
 class GithubRepository(
-    private val service: GithubService,
-    private val cache: GithubLocalCache
+        private val service: GithubService,
+        private val cache: GithubLocalCache
 ) {
+    companion object {
+        private const val DATABASE_PAGE_SIZE = 20
+    }
 
     /**
      * Search repositories whose names match the query.
@@ -46,15 +49,14 @@ class GithubRepository(
         val networkErrors = boundaryCallback.networkErrors
 
         // Get the paged list
-        val data = LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE)
-                .setBoundaryCallback(boundaryCallback)
-                .build()
+        val data =
+                LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE)
+                        .setBoundaryCallback(boundaryCallback)
+                        .build()
 
         // Get the network errors exposed by the boundary callback
         return RepoSearchResult(data, networkErrors)
     }
 
-    companion object {
-        private const val DATABASE_PAGE_SIZE = 20
-    }
+
 }

@@ -33,6 +33,10 @@ import com.example.android.codelabs.paging.model.Repo
 import kotlinx.android.synthetic.main.activity_search_repositories.*
 
 class SearchRepositoriesActivity : AppCompatActivity() {
+    companion object {
+        private const val LAST_SEARCH_QUERY: String = "last_search_query"
+        private const val DEFAULT_QUERY = "Android"
+    }
 
     private lateinit var viewModel: SearchRepositoriesViewModel
     private val adapter = ReposAdapter()
@@ -50,8 +54,10 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         list.addItemDecoration(decoration)
 
         initAdapter()
+
         val query = savedInstanceState?.getString(LAST_SEARCH_QUERY) ?: DEFAULT_QUERY
         viewModel.searchRepo(query)
+
         initSearch(query)
     }
 
@@ -62,11 +68,13 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     private fun initAdapter() {
         list.adapter = adapter
+
         viewModel.repos.observe(this, Observer<PagedList<Repo>> {
             Log.d("Activity", "list: ${it?.size}")
             showEmptyList(it?.size == 0)
             adapter.submitList(it)
         })
+
         viewModel.networkErrors.observe(this, Observer<String> {
             Toast.makeText(this, "\uD83D\uDE28 Wooops $it", Toast.LENGTH_LONG).show()
         })
@@ -113,8 +121,5 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private const val LAST_SEARCH_QUERY: String = "last_search_query"
-        private const val DEFAULT_QUERY = "Android"
-    }
+
 }

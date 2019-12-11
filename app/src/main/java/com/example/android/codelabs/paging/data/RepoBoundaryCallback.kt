@@ -30,7 +30,8 @@ import com.example.android.codelabs.paging.model.Repo
  * the database cannot provide any more data.
  * リストの端まで到達すると通知を受けるバウンダリーコールバック
  **/
-class RepoBoundaryCallback(
+class RepoBoundaryCallback
+(
         private val query: String,
         private val service: GithubService,
         private val cache: GithubLocalCache
@@ -52,7 +53,7 @@ class RepoBoundaryCallback(
 
     /**
      * Database returned 0 items. We should query the backend for more items.
-     * イニシャルロードが、0アイテムの場合
+     * イニシャルロードが、ゼロの場合
      */
     override fun onZeroItemsLoaded() {
         Log.d("RepoBoundaryCallback", "onZeroItemsLoaded")
@@ -75,6 +76,7 @@ class RepoBoundaryCallback(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
+
         //ページインデックスを使用してロード
         searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE,
                 //成功時

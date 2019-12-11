@@ -24,6 +24,7 @@ import java.util.concurrent.Executor
 /**
  * Class that handles the DAO local data source. This ensures that methods are triggered on the
  * correct executor.
+ * DAOローカルデータソースを処理するクラス。 これにより、正しいエグゼキューターでメソッドがトリガーされる。
  */
 class GithubLocalCache(
         private val repoDao: RepoDao,

@@ -32,14 +32,15 @@ import com.example.android.codelabs.paging.model.RepoSearchResult
 class SearchRepositoriesViewModel(private val repository: GithubRepository) : ViewModel() {
 
     private val queryLiveData = MutableLiveData<String>()
-    private val repoResult: LiveData<RepoSearchResult> = Transformations.map(queryLiveData) {
-        repository.search(it)
-    }
 
-    val repos: LiveData<PagedList<Repo>> = Transformations.switchMap(repoResult) { it -> it.data }
-    val networkErrors: LiveData<String> = Transformations.switchMap(repoResult) { it ->
-        it.networkErrors
-    }
+    private val repoResult: LiveData<RepoSearchResult> =
+            Transformations.map(queryLiveData) { repository.search(it) }
+
+    val repos: LiveData<PagedList<Repo>> =
+            Transformations.switchMap(repoResult) { it -> it.data }
+
+    val networkErrors: LiveData<String> =
+            Transformations.switchMap(repoResult) { it -> it.networkErrors }
 
     /**
      * Search a repository based on a query string.
